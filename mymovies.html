@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MyMovies Dashboard</title>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #141414;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            transition: background-color 0.5s;
+        }
+
+        .header {
+            background-color: #000000;
+            padding: 15px 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+        }
+        .logo {
+            color: #e50914;
+            font-size: 2em;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-shadow: 0 0 5px rgba(229, 9, 20, 0.5);
+        }
+        .nav a {
+            color: #ffffff;
+            text-decoration: none;
+            margin-left: 25px;
+            font-size: 1.1em;
+            transition: color 0.3s, transform 0.2s;
+            cursor: pointer;
+        }
+        .nav a:hover {
+            color: #ff3344;
+            transform: scale(1.05);
+            text-decoration: underline;
+        }
+        .active-nav {
+            font-weight: bold;
+            color: #e50914 !important;
+            text-decoration: underline !important;
+        }
+
+        .hero-banner {
+            height: 450px;
+            background-color: #333;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('images/background.png');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 50px;
+            box-shadow: inset 0 -20px 50px rgba(0, 0, 0, 0.9);
+            animation: fadeIn 1s ease-out;
+        }
+        .hero-quote {
+            max-width: 900px;
+        }
+        .hero-quote h1 {
+            font-size: 4em;
+            margin-bottom: 15px;
+            color: #ffffff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.8), 0 0 5px #e50914;
+            animation: fadeIn 1.5s ease-out 0.5s both;
+        }
+        .hero-quote p {
+            font-size: 1.6em;
+            color: #ccc;
+            font-style: italic;
+            text-shadow: 1px 1px 5px #000;
+            animation: fadeIn 1.5s ease-out 0.8s both;
+        }
+
+        .content {
+            padding: 30px 50px;
+            min-height: 40vh;
+        }
+        .content h2 {
+            color: #ff3344;
+            border-bottom: 2px solid rgba(229, 9, 20, 0.5);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .movie-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 25px;
+            margin-top: 20px;
+        }
+
+        .movie-card {
+            width: 200px;
+            height: 350px;
+            background-color: #222;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.7);
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+            text-decoration: none;
+            color: inherit;
+            opacity: 0;
+            animation: fadeIn 0.8s ease-out forwards;
+        }
+        .movie-card:nth-child(even) { animation-delay: 0.1s; }
+        .movie-card:nth-child(3n) { animation-delay: 0.2s; }
+
+        .movie-card:hover {
+            transform: scale(1.1) translateY(-5px);
+            z-index: 10;
+            box-shadow: 0 15px 30px rgba(229, 9, 20, 0.6);
+            border: 1px solid #e50914;
+        }
+        .movie-placeholder {
+            height: 80%;
+            background-color: #333;
+            text-align: center;
+            padding: 0;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .movie-placeholder img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .movie-title-card {
+            height: 20%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-align: center;
+            line-height: 1.3;
+            background-color: #1a1a1a;
+        }
+        
+        .about-us-content {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #222;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.7);
+            animation: fadeIn 1s ease-out;
+        }
+        .about-us-content h2 {
+            color: #e50914;
+            border-bottom: 2px solid #e50914;
+        }
+
+
+        .modal {
+            display: none;	
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.95);	
+        }
+        .modal-content {
+            background-color: #1a1a1a;
+            margin: 8% auto;
+            padding: 40px;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 900px;
+            box-shadow: 0 0 30px rgba(229, 9, 20, 0.4);
+            animation: fadeIn 0.3s ease-out;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            transition: color 0.3s, transform 0.2s;
+        }
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #fff;
+            transform: rotate(90deg);
+            text-shadow: 0 0 10px #fff;
+            cursor: pointer;
+        }
+        .modal-title {
+            color: #e50914;
+            margin-bottom: 15px;
+            font-size: 2.2em;
+            text-shadow: 1px 1px 3px #000;
+        }
+        .modal-description {
+            line-height: 1.6;
+            color: #ccc;
+        }
+        .modal-buttons {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+        }
+        .modal-buttons button, .modal-buttons a {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1.1em;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            font-weight: bold;
+            transition: all 0.3s ease-in-out;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+        }
+        .watch-btn {
+            background-color: #e50914;
+            color: white;
+        }
+        .watch-btn:hover {
+            background-color: #ff3344;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(229, 9, 20, 0.7);
+        }
+        .favorite-btn {
+            background-color: #444;
+            color: white;
+        }
+        .favorite-btn:hover {
+            background-color: #666;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8);
+        }
+        .favorite-btn.favorited {
+            background-color: #008000;	
+        }
+        .favorite-btn.favorited:hover {
+            background-color: #00a000;	
+            box-shadow: 0 6px 15px rgba(0, 128, 0, 0.7);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="logo">MyMovies</div>
+        <div class="nav">
+            <a id="nav-home" onclick="showPage('home')">Home</a>
+            <a id="nav-favorites" onclick="showPage('favorites')">Favorites</a>
+            <a id="nav-about" onclick="showPage('about')">About Us</a>
+        </div>
+    </div>
+
+    <section id="home-page">
+        <div class="hero-banner">
+            <div class="hero-quote">
+                <h1>"Escape Reality. Enter Film."</h1>
+                <p>— Find your favorite feeling.</p>
+            </div>
+        </div>
+        
+        <div class="content">
+            <h2>🍿 All Movies</h2>
+            <div id="home-movie-grid" class="movie-grid">
+            </div>
+        </div>
+    </section>
+
+    <section id="favorites-page" style="display:none;">
+        <div class="content">
+            <h2>⭐ My Favorites</h2>
+            <div id="favorites-movie-grid" class="movie-grid">
+                <p id="no-favorites-message" style="color:#aaa;">Wala pa pong favorite movies. Pindutin ang ⭐ sa isang movie para idagdag dito.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section id="about-page" style="display:none;">
+        <div class="about-us-content">
+            <h2>About MyMovies</h2>
+              <p>MyMovies is a fan site dedicated to celebrating the films and legendary performances of one of cinema’s greatest action stars. Explore his movies, stunts, and timeless impact on the world of film.</p>           
+        </div>
+    </section>
+
+    <div id="movie-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            
+            <div style="display: flex; gap: 25px; align-items: flex-start;">	
+                <div id="modal-poster" style="width: 180px; flex-shrink: 0;">	
+                </div>
+
+                <div>
+                    <h2 id="modal-title" class="modal-title"></h2>
+                    <p id="modal-description" class="modal-description"></p>
+                    
+                    <div class="modal-buttons">
+                        <button id="favorite-toggle-btn" class="favorite-btn" onclick="toggleFavorite()"></button>
+                        <a id="modal-watch-btn" class="watch-btn" href="#" target="_blank">📺 Watch Now</a>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+
+    <script>
+        const movies = [
+            {	
+                id: 1,	
+                title: "Rob B Hood",	
+                desc: "Rob-B-Hood (2006) is a Hong Kong action-comedy starring Jackie Chan as Fong, a compulsive gambler and thief who, along with his partners Thongs and Octopus, reluctantly ends up caring for a kidnapped baby, BB, leading to unexpected bonding and comedic challenges as they try to return the infant to his wealthy grandfather, navigating dangerous criminals and discovering paternal instincts. ",	
+                link: "https://youtu.be/3MEgmBw5GoU?si=rBkOBHurt9Xgx-Hj",
+                image: "images/Robin.jpg"	
+            },
+            {	
+                id: 2,	
+                title: "Master with Cracked Fingers",	
+                desc: "Master with Cracked Fingers in 1971 where a young, undisciplined Jackie learns secret, powerful kung fu from a mysterious old beggar (played by Simon Yuen), eventually using his hardened 'cracked finger' skills to fight off extortionists threatening his uncle's restaurant, despite his father's disapproval, leading to a tragic revenge plot. ",	
+                link: "https://youtu.be/eQVSX5YT3lY?si=4CHJ6yOfUHXw-dgy",
+                image: "images/Master.jpg"	
+            },
+            {	
+                id: 3,	
+                title: "Drunken Master",	
+                desc: "Drunken Master in 1978 where a rebellious teen is forced to master the eccentric Drunken Boxing style to defeat a deadly assassin. The film that launched the Kung Fu Comedy genre.",	
+                link: "https://youtu.be/Slegu1PAwgo?si=fFHdv0TojGiCbKCq",
+                image: "images/Drunken.jpg"	
+            },
+            {	
+                id: 4,	
+                title: "Police Story",	
+                desc: "Police Story inn 1985 here a determined Hong Kong cop is framed by a drug lord and must fight to clear his name. Famous for its career-defining, glass-shattering mall stunts.",	
+                link: "https://youtu.be/MwrWRxoeNU8?si=sG15gqfXXa_GEpaM",
+                image: "images/police.jpg"	
+            },
+            {	
+                id: 5,	
+                title: "Armour of God",	
+                desc: "Armour of God in 1986 where a adventurer Asian Hawk (Chan) hunts down missing pieces of a legendary European religious relic from a dangerous cult.",	
+                link: "https://youtu.be/OuUkd2dWY5U?si=CUAmH6SGeuznfM6g",
+                image: "images/Armour.jpg"	
+            },
+            {	
+                id: 6,	
+                title: "Rush Hour",	
+                desc: "Rush Hour in 1998 where a reserved Hong Kong detective (Chan) is forced to partner with a loudmouthed LAPD officer (Chris Tucker) to rescue a kidnapped girl. Massive Hollywood success.",	
+                link: "https://youtu.be/vQlJ2rxipHQ?si=Al4XfSDEIPFwBIm5",
+                image: "images/Rush.jpg"	
+            },
+            {	
+                id: 7,	
+                title: "Who Am I",	
+                desc: "Who Am I in 1998 where an amnesiac commando tries to rediscover his identity while being chased by assassins. Iconic finale features the skyscraper glass slide stunt.",	
+                link: "https://youtu.be/ftAc-A2ac7Y?si=9b8TmztcXHml8O6B",
+                image: "images/who.jpg"	
+            },
+            {	
+                id: 8,	
+                title: "Snake in the Eagle's Shadow ",	
+                desc: "Snake in the Eagle's Shadow (1978): Jackie plays an abused orphan janitor at a martial arts school who secretly learns the lethal Snake Fist style from an old, hidden beggar. This was the first major film to fuse his comedic acting with martial arts, laying the groundwork for Drunken Master later that year.",	
+                link: "https://youtu.be/3P577Yg5GrY?si=smtKB8En5HUNtJYx",
+                image: "images/snake.jpg"	
+            },
+            {	
+                id: 9,	
+                title: "The Tuxedo",	
+                desc: "The Tuxedo in 2002 where Cabbie-turned-chauffeur Jimmy Tong (Chan) accidentally puts on his boss's high-tech, billion-dollar tuxedo after the secret agent is injured. The suit grants the wearer superhuman speed, fighting skills, and gadgets. Jimmy is suddenly thrust into the dangerous world of espionage, where he must work with a rookie partner to stop a water tycoon who plans to contaminate the world's water supply.",	
+                link: "https://youtu.be/VkNJTNLp85w?si=JDuokUhMONkpLB1B",
+                image: "images/tuxedo.jpg"	
+            },
+            {	
+                id: 10,	
+                title: "The Myth",	
+                desc: "The Myth in 2005 where Archaeologist Jack Chan is plagued by recurring dreams of his past life as General Meng Yi, who was tasked with protecting a beautiful Korean princess in the Qin Dynasty two thousand years ago. When Jack begins finding artifacts linked to his dreams, he and his friend travel the globe on an Indiana Jones-style quest that leads him to a zero-gravity tomb and the shocking truth of his immortal past.",	
+                link: "https://youtu.be/E3ZlGJ_wopA?si=Gwvn777GaZGBVVKD",
+                image: "images/the.jpg"	
+            }
+            	
+        ];
+
+        let currentModalMovieId = null;
+
+        function getFavorites() {
+            const favorites = JSON.parse(localStorage.getItem('myMoviesFavorites') || '[]');
+            return favorites.map(id => parseInt(id)).filter(id => !isNaN(id));
+        }
+
+        function saveFavorites(favorites) {
+            localStorage.setItem('myMoviesFavorites', JSON.stringify(favorites));
+        }
+
+        function showPage(pageId) {
+            document.getElementById('home-page').style.display = 'none';
+            document.getElementById('favorites-page').style.display = 'none';
+            document.getElementById('about-page').style.display = 'none';
+
+            document.getElementById('nav-home').classList.remove('active-nav');
+            document.getElementById('nav-favorites').classList.remove('active-nav');
+            document.getElementById('nav-about').classList.remove('active-nav');
+
+            document.getElementById(`${pageId}-page`).style.display = 'block';
+
+            document.getElementById(`nav-${pageId}`).classList.add('active-nav');
+
+            if (pageId === 'favorites') {
+                renderFavorites();
+            } else if (pageId === 'home') {
+                renderHome(movies);
+            }
+        }
+
+        function createMovieCard(movie) {
+            const imageHtml = movie.image	
+                ? `<img src="${movie.image}" alt="${movie.title} Poster">`	
+                : `<p>Poster: ${movie.title}</p>`;
+
+            return `
+                <div class="movie-card" onclick="openModal(${movie.id})">
+                    <div class="movie-placeholder">
+                        ${imageHtml}
+                    </div>
+                    <div class="movie-title-card">
+                        ${movie.title}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHome(movieList) {
+            const grid = document.getElementById('home-movie-grid');
+            grid.innerHTML = movieList.map(createMovieCard).join('');
+        }
+
+        function renderFavorites() {
+            const favorites = getFavorites();
+            const favoritesGrid = document.getElementById('favorites-movie-grid');
+            const noFavoritesMsg = document.getElementById('no-favorites-message');
+
+            if (favorites.length === 0) {
+                favoritesGrid.innerHTML = '';
+                noFavoritesMsg.style.display = 'block';
+            } else {
+                noFavoritesMsg.style.display = 'none';
+                const favoriteMovies = movies.filter(movie => favorites.includes(movie.id));
+                favoritesGrid.innerHTML = favoriteMovies.map(createMovieCard).join('');
+            }
+        }
+
+        function openModal(movieId) {
+            const movie = movies.find(m => m.id === movieId);
+            if (!movie) return;
+
+            currentModalMovieId = movieId;
+
+            document.getElementById('modal-title').textContent = movie.title;
+            document.getElementById('modal-description').textContent = movie.desc;
+            document.getElementById('modal-watch-btn').href = movie.link;
+
+            const posterDiv = document.getElementById('modal-poster');
+            if (movie.image) {
+                posterDiv.innerHTML = `<img src="${movie.image}" alt="${movie.title} Poster" style="width: 100%; height: auto; border-radius: 5px;">`;
+            } else {
+                posterDiv.innerHTML = `<div style="width: 180px; height: 270px; background-color: #444; border-radius: 5px; display: flex; align-items: center; justify-content: center;"><p style="text-align:center; color:#aaa;">No Poster Available</p></div>`;
+            }
+
+            updateFavoriteButton();
+
+            document.getElementById('movie-modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('movie-modal').style.display = 'none';
+            currentModalMovieId = null;
+        }
+
+        function updateFavoriteButton() {
+            const favorites = getFavorites();
+            const btn = document.getElementById('favorite-toggle-btn');
+            
+            if (favorites.includes(parseInt(currentModalMovieId))) {
+                btn.textContent = '⭐ Favorited (Remove)';
+                btn.classList.add('favorited');
+            } else {
+                btn.textContent = '☆ Add to Favorites';
+                btn.classList.remove('favorited');
+            }
+        }
+
+        function toggleFavorite() {
+            if (!currentModalMovieId) return;
+
+            const movieIdToToggle = parseInt(currentModalMovieId);	
+
+            let favorites = getFavorites();
+            const index = favorites.indexOf(movieIdToToggle);
+            const movieTitle = movies.find(m => m.id === movieIdToToggle).title;
+
+            if (index > -1) {
+                favorites.splice(index, 1);
+                alert(`Removed "${movieTitle}" from Favorites!`);
+            } else {
+                favorites.push(movieIdToToggle);
+                alert(`Added "${movieTitle}" to Favorites!`);
+            }
+
+            saveFavorites(favorites);
+            updateFavoriteButton();	
+            
+            if (document.getElementById('favorites-page').style.display !== 'none') {
+                renderFavorites();
+            }
+        }
+
+        window.onload = function() {
+            showPage('home');
+        };
+        
+        window.onclick = function(event) {
+            const modal = document.getElementById('movie-modal');
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
